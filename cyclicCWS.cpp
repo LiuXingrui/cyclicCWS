@@ -9,12 +9,57 @@
 
 using namespace std;
 
+ofstream Circuit("circuit.txt");
+void qreg(int n,string q="q") {
+	Circuit << "qreg "<<q<<"[" << n << "];" << endl;
+
+}
+void creg(int n,string c="c") {
+	Circuit << "creg "<<c<<"[" << n << "];" << endl;
+
+}
+
+void X(int n, string q = "q") {
+	Circuit << "x " << q << "[" << n << "];" << endl;
+
+}
+
+void Z(int n, string q = "q") {
+	Circuit << "z " << q << "[" << n << "];" << endl;
+
+}
+
+void CNOT(int n1, int n2, string q1 = "q",string q2="a") {
+	Circuit << "cx " << q1 << "[" << n1 << "],"<<q2<<"["<<n2<<"];" << endl;
+
+}
+
+void CZ(int n1, int n2, string q1 = "q", string q2 = "a") {
+	Circuit << "cz " << q1 << "[" << n1 << "]," << q2 << "[" << n2 << "];" << endl;
+
+}
+
+void H(int n, string q = "q") {
+	Circuit << "h " << q << "[" << n << "];" << endl;
+
+}
+void Measure( string a = "a", string c = "c",int n1=-1, int n2=-1) {
+	if (n1 == -1 && n2 == -1) {
+		Circuit << "measure " << a << "->"<<c << ";" << endl;
+	}
+	else if (n1 >= 0 && n2 >= 0) {
+		Circuit << "measure " << a <<"["<<n1<< "]->" << c <<"["<<n2<< "];" << endl;
+
+	}
+
+
+}
 
 int main(int argc, char* argv[])
 
 {
-	int t = atoi(argv[1]);
-	int n = t * t + (t + 1) * (t + 1);
+	int const t = atoi(argv[1]);
+	int const n = t * t + (t + 1) * (t + 1);
 	vector<char> S1;
 
 
@@ -49,28 +94,36 @@ int main(int argc, char* argv[])
 	}
 
 	//input circuit by openQASM
-	ofstream Circuit("circuit.txt");
+
 	
 	
-	Circuit << "qreg q[" << n << "];" << endl;
-	Circuit << "creg c[" << n-1 << "];\n" << endl;
+	Circuit << "OPENQASM 2.0;\ninclude \"qelib1.inc\";" << endl;
+	qreg(n,"q");
+	qreg(n - 1, "a");
+	creg(n, "c");
+
+	Circuit << "\n";
 
 
 	for (int j = 0; j < n-1; j++) {
 		for (int i = 0; i < n; i++) {
 			if (stabilizers[j][i] == 'X') {
-				Circuit << "h q[" << i << "];" << endl;
-				Circuit << "cx q[" << i << "],c[" << j << "];" << endl;
-				Circuit << "h q[" << i << "];\n\n" ;
+				H(i, "q");
+				CNOT(i,j, "q","a");
+				H(i,"q");
+				Circuit << "\n";
 			}
 			else if (stabilizers[j][i] == 'Z') {
-				Circuit << "cx q[" << i << "],c[" << j << "];\n\n" ;
+				CNOT(i, j, "q", "a");
+				Circuit << "\n";
 			}
 
 			
 		}
-		Circuit << "barrier q\n\n" ;
+		
 	}
+	Measure("a", "c");
+
 	Circuit.close();
 	return 0;
 }
