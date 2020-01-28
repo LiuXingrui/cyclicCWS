@@ -30,7 +30,7 @@ void Z(int n, string q = "q") {
 }
 
 void CNOT(int n1, int n2, string q1 = "q",string q2="a") {
-	Circuit << "cx " << q1 << "[" << n1 << "],"<<q2<<"["<<n2<<"];" << endl;
+	Circuit << "cx " << q1 << "[" << n1 << "], "<<q2<<"["<<n2<<"];" << endl;
 
 }
 
@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
 	Circuit << "OPENQASM 2.0;\ninclude \"qelib1.inc\";" << endl;
 	qreg(n,"q");
 	qreg(n - 1, "a");
-	creg(n, "c");
+	creg(n-1, "c");
 
 	Circuit << "\n";
 
