@@ -22,8 +22,7 @@ bool Qcommute(const string& v1, const string& v2) {
 }
 //this functon is not used in the file.
 
-// the product of 2 Pauli operators:
-
+/** Doxygen style comment: the product of 2 Pauli operators: */
 string product(const string&v1, const string &v2){
 	string p;
 	
